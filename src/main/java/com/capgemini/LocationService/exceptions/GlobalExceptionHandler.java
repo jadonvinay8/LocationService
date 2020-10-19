@@ -41,6 +41,12 @@ public class GlobalExceptionHandler {
                 "400"), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(OperationFailedException.class)
+    public ResponseEntity<ErrorResponse> operationFailed(OperationFailedException e) {
+        return new ResponseEntity<>(new ErrorResponse("Something went wrong in companion service",
+                e.getMessage(), "500"), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> anyUnhandledException(Exception e) {
         return new ResponseEntity<>(new ErrorResponse("City Already exists", e.getMessage(), "500"),

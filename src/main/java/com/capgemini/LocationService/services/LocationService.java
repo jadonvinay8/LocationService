@@ -11,7 +11,7 @@ import java.util.stream.StreamSupport;
 import com.capgemini.LocationService.dao.LocationDAO;
 import com.capgemini.LocationService.exceptions.CityAlreadyExistException;
 import com.capgemini.LocationService.exceptions.CityNotFoundException;
-import com.capgemini.LocationService.exceptions.SomethingWentWrongException;
+import com.capgemini.LocationService.exceptions.OperationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -53,17 +53,19 @@ public class LocationService {
 		return this.getAllCities()
 				.stream()
 				.map(City::getCityName)
+				.map(String::toLowerCase)
 				.collect(Collectors.toSet());
 	}
 
 	private void validateUniqueConstraint(String city) {
-		if (getCityNames().contains(city))
+		if (getCityNames().contains(city.toLowerCase()))
 			throw new CityAlreadyExistException("City with name " + city + " already exists");
 	}
 
 	private void validateUniqueConstraint(List<String> cities) {
 		var existentCities = getCityNames();
 		cities.stream()
+				.map(String::toLowerCase)
 				.filter(existentCities::contains)
 				.forEach(city -> {
 					throw new CityAlreadyExistException("City with name " + city + " already exists");
@@ -94,7 +96,7 @@ public class LocationService {
 			restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
 			locationDAO.delete(city);
 		} catch (HttpClientErrorException e) {
-			throw new SomethingWentWrongException("Something went wrong in theater service");
+			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
 		}
 	}
 
@@ -116,10 +118,9 @@ public class LocationService {
 	}
 
 	private List<String> validateInputList(List<String> list) {
-		 return Optional.ofNullable(list)
-				 .orElseThrow(() -> {
-					throw new NullPointerException("Null value supplied in payload");
-				});
+		 return Optional.ofNullable(list).orElseThrow(() -> {
+			throw new NullPointerException("Null value supplied in payload");
+		});
 	}
 
 

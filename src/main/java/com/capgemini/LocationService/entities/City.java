@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @DynamoDBTable(tableName = "Locations")
 public class City {
@@ -45,5 +46,17 @@ public class City {
         this.cityName = cityName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        City city = (City) o;
+        return Objects.equals(id, city.id) &&
+                Objects.equals(cityName, city.cityName);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, cityName);
+    }
 }
