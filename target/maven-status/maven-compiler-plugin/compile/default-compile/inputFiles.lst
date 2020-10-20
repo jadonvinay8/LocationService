@@ -1,7 +1,7 @@
 D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\configuration\AppConfig.java
 D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\exceptions\CityNotFoundException.java
 D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\entities\City.java
-D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\exceptions\SomethingWentWrongException.java
+D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\exceptions\OperationFailedException.java
 D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\exceptions\GlobalExceptionHandler.java
 D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\controllers\LocationController.java
 D:\Programming\Individual Microservices\Location API\master\09.24.2020\LocationAPI\src\main\java\com\capgemini\LocationService\configuration\DynamoDBConfig.java

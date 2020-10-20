@@ -2,7 +2,6 @@ com\capgemini\LocationService\dao\LocationDAO.class
 com\capgemini\LocationService\beans\ErrorResponse.class
 com\capgemini\LocationService\exceptions\GlobalExceptionHandler.class
 com\capgemini\LocationService\entities\City.class
-com\capgemini\LocationService\exceptions\SomethingWentWrongException.class
 com\capgemini\LocationService\configuration\DynamoDBConfig.class
 com\capgemini\LocationService\controllers\TestController.class
 com\capgemini\LocationService\services\LocationService.class
@@ -12,3 +11,4 @@ com\capgemini\LocationService\exceptions\CityNotFoundException.class
 com\capgemini\LocationService\controllers\LocationController.class
 com\capgemini\LocationService\LocationApplication.class
 com\capgemini\LocationService\exceptions\CityAlreadyExistException.class
+com\capgemini\LocationService\exceptions\OperationFailedException.class

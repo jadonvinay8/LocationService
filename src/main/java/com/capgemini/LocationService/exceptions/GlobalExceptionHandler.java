@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> anyUnhandledException(Exception e) {
-        return new ResponseEntity<>(new ErrorResponse("City Already exists", e.getMessage(), "500"),
+        return new ResponseEntity<>(new ErrorResponse("Some unknown error occurred", e.getMessage(), "500"),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

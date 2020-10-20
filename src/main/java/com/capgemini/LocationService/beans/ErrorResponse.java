@@ -7,12 +7,10 @@ public class ErrorResponse {
 	private String code;
 	
 	public ErrorResponse() {
-		super();
 		// Default Constructor
 	}
 
 	public ErrorResponse(String errorMsg, String exception, String code) {
-		super();
 		this.errorMsg = errorMsg;
 		this.cause = exception;
 		this.code = code;
