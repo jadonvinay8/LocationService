@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.capgemini.LocationService.entities.City;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -97,6 +98,8 @@ public class LocationService {
 			locationDAO.delete(city);
 		} catch (HttpClientErrorException e) {
 			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
+		} catch (HttpServerErrorException e) {
+			throw new OperationFailedException("Something went wrong in other API");
 		}
 	}
 
