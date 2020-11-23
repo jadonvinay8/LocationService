@@ -9,11 +9,11 @@ import com.capgemini.LocationService.dao.LocationDAO;
 import com.capgemini.LocationService.exceptions.CityAlreadyExistException;
 import com.capgemini.LocationService.exceptions.CityNotFoundException;
 import com.capgemini.LocationService.exceptions.OperationFailedException;
+import com.capgemini.LocationService.entities.City;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.capgemini.LocationService.entities.City;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -66,9 +66,7 @@ public class LocationService {
           .map(String::toLowerCase)
           .map(String::trim)
           .filter(existentCities::contains)
-          .forEach(city -> {
-              invalidCities.add(city);
-          });
+          .forEach(invalidCities::add);
         return invalidCities;
     }
 
@@ -92,17 +90,16 @@ public class LocationService {
 
     public void deleteCity(String id) {
         City city = findById(id);
-        locationDAO.delete(city);
-//		var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
-//
-//		try {
-//			restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
-//			locationDAO.delete(city);
-//		} catch (HttpClientErrorException e) {
-//			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
-//		} catch (HttpServerErrorException e) {
-//			throw new OperationFailedException("Something went wrong in other API");
-//		}
+		var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
+
+		try {
+			restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
+			locationDAO.delete(city);
+		} catch (HttpClientErrorException e) {
+			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
+		} catch (HttpServerErrorException e) {
+			throw new OperationFailedException("Something went wrong in other API");
+		}
     }
 
     public void addMultipleCities(List<String> cities) {
