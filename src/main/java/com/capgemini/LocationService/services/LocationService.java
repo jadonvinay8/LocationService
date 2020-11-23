@@ -1,10 +1,7 @@
 package com.capgemini.LocationService.services;
 
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -24,107 +21,126 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Service class to perform CRUD operations related to Location functionality
- * 
- * @author Vinay Pratap Singh
  *
+ * @author Vinay Pratap Singh
  */
 @Service
 @Transactional
 public class LocationService {
 
-	private final LocationDAO locationDAO;
-	private final RestTemplate restTemplate;
+    private final LocationDAO locationDAO;
+    private final RestTemplate restTemplate;
 
-	@Value("${service.theater.removal}")
-	private String theaterRemovalUrl;
+    @Value("${service.theater.removal}")
+    private String theaterRemovalUrl;
 
-	@Autowired
-	public LocationService(LocationDAO locationDAO, RestTemplate restTemplate) {
-		this.locationDAO = locationDAO;
-		this.restTemplate = restTemplate;
-	}
+    @Autowired
+    public LocationService(LocationDAO locationDAO, RestTemplate restTemplate) {
+        this.locationDAO = locationDAO;
+        this.restTemplate = restTemplate;
+    }
 
-	public List<City> getAllCities() {
-		return StreamSupport
-				.stream(locationDAO.findAll().spliterator(), false)
-				.collect(Collectors.toList());
-	}
+    public List<City> getAllCities() {
+        return StreamSupport
+          .stream(locationDAO.findAll().spliterator(), false)
+          .collect(Collectors.toList());
+    }
 
-	private Set<String> getCityNames() {
-		return this.getAllCities()
-				.stream()
-				.map(City::getCityName)
-				.map(String::toLowerCase)
-				.collect(Collectors.toSet());
-	}
+    private Set<String> getCityNames() {
+        return this.getAllCities()
+          .stream()
+          .map(City::getCityName)
+          .map(String::toLowerCase)
+          .collect(Collectors.toSet());
+    }
 
-	private void validateUniqueConstraint(String city) {
-		if (getCityNames().contains(city.toLowerCase()))
-			throw new CityAlreadyExistException("City with name " + city + " already exists");
-	}
+    private void validateUniqueConstraint(String city) {
+        if (getCityNames().contains(city.trim().toLowerCase()))
+            throw new CityAlreadyExistException("City with name " + city.trim() + " already exists");
+    }
 
-	private void validateUniqueConstraint(List<String> cities) {
-		var existentCities = getCityNames();
-		cities.stream()
-				.map(String::toLowerCase)
-				.filter(existentCities::contains)
-				.forEach(city -> {
-					throw new CityAlreadyExistException("City with name " + city + " already exists");
-				});
-	}
-	public City addCity(City city) {
-		validateUniqueConstraint(city.getCityName()); // throws exception if invalid
-		return locationDAO.save(city);
-	}
+    private List<String> validateUniqueConstraint(List<String> cities) {
+        var existentCities = getCityNames();
+        List<String> invalidCities = new ArrayList<>();
+        cities.stream()
+          .map(String::toLowerCase)
+          .map(String::trim)
+          .filter(existentCities::contains)
+          .forEach(city -> {
+              invalidCities.add(city);
+          });
+        return invalidCities;
+    }
 
-	public City findById(String id) {
-		return locationDAO.findById(id).orElseThrow(CityNotFoundException::new);
-	}
+    public City addCity(City city) throws CityAlreadyExistException {
+        validateUniqueConstraint(city.getCityName()); // throws exception if invalid
+        city.setCityName(city.getCityName().trim());
+        return locationDAO.save(city);
+    }
 
-	public City updateCity(String id, City city) {
-		findById(id); // if this city didn't exist previously, an exception will be thrown
-		city.setId(id);
+    public City findById(String id) throws CityNotFoundException {
+        return locationDAO.findById(id).orElseThrow(CityNotFoundException::new);
+    }
 
-		validateUniqueConstraint(city.getCityName()); // throws exception if invalid
-		return locationDAO.save(city);
-	}
+    public City updateCity(String id, City city) {
+        findById(id); // if this city didn't exist previously, an exception will be thrown
+        city.setId(id);
 
-	public void deleteCity(String id) {
-		City city = findById(id);
-		var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
+        validateUniqueConstraint(city.getCityName()); // throws exception if invalid
+        return locationDAO.save(city);
+    }
 
-		try {
-			restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
-			locationDAO.delete(city);
-		} catch (HttpClientErrorException e) {
-			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
-		} catch (HttpServerErrorException e) {
-			throw new OperationFailedException("Something went wrong in other API");
-		}
-	}
+    public void deleteCity(String id) {
+        City city = findById(id);
+        locationDAO.delete(city);
+//		var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
+//
+//		try {
+//			restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
+//			locationDAO.delete(city);
+//		} catch (HttpClientErrorException e) {
+//			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
+//		} catch (HttpServerErrorException e) {
+//			throw new OperationFailedException("Something went wrong in other API");
+//		}
+    }
 
-	public void addMultipleCities(List<String> cities) {
-		validateUniqueConstraint(cities); // throws exception if invalid
+    public void addMultipleCities(List<String> cities) {
+        List<String> invalidCities = validateUniqueConstraint(cities);
+        if (!invalidCities.isEmpty()) {
+            throw new CityAlreadyExistException("These cities already exist: " + invalidCities);
+        }
 
-		Set<City> filteredCities = validateInputList(cities)
-				.stream()
-				.filter(Objects::nonNull)
-				.map(City::new)
-				.collect(Collectors.toSet());
+        Set<City> filteredCities = validateInputList(cities)
+          .stream()
+          .filter(Objects::nonNull)
+          .map(String::trim)
+          .map(City::new)
+          .collect(Collectors.toSet());
 
-		locationDAO.saveAll(filteredCities);
-	}
+        locationDAO.saveAll(filteredCities);
+    }
 
-	public boolean validateBatchExistence(List<String> cityIds) {
-		validateInputList(cityIds).forEach(this::findById);
-		return true;
-	}
+    public Map<String, String> validateBatchExistence(List<String> cityIds) {
+        Map<String, String> cityMap = new HashMap<>();
+        List<String> invalidIds = new ArrayList<>();
 
-	private List<String> validateInputList(List<String> list) {
-		 return Optional.ofNullable(list).orElseThrow(() -> {
-			throw new NullPointerException("Null value supplied in payload");
-		});
-	}
+        validateInputList(cityIds).forEach(cityId -> {
+            try {
+                cityMap.put(cityId, findById(cityId).getCityName());
+            } catch (CityNotFoundException exception) {
+                invalidIds.add(cityId);
+            }
+            cityMap.put("Invalid", invalidIds.toString());
+        });
+        return cityMap;
+    }
+
+    private List<String> validateInputList(List<String> list) {
+        return Optional.ofNullable(list).orElseThrow(() -> {
+            throw new NullPointerException("Null value supplied in payload");
+        });
+    }
 
 
 }

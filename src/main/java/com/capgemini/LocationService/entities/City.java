@@ -47,6 +47,14 @@ public class City {
     }
 
     @Override
+    public String toString() {
+        return "City{" +
+          "id='" + id + '\'' +
+          ", cityName='" + cityName + '\'' +
+          '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

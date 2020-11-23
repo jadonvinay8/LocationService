@@ -8,6 +8,7 @@ com\capgemini\LocationService\services\LocationService.class
 META-INF\spring-configuration-metadata.json
 com\capgemini\LocationService\configuration\AppConfig.class
 com\capgemini\LocationService\exceptions\CityNotFoundException.class
+com\capgemini\LocationService\configuration\SpringFoxConfig.class
 com\capgemini\LocationService\controllers\LocationController.class
 com\capgemini\LocationService\LocationApplication.class
 com\capgemini\LocationService\exceptions\CityAlreadyExistException.class
