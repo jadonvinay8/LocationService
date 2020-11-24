@@ -1,4 +1,4 @@
-package com.capgemini.LocationService.beans;
+package com.capgemini.LocationService.dto;
 
 public class ErrorResponse {
 
