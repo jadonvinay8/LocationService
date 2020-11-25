@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.capgemini.LocationService.dao.LocationDAO;
+import com.capgemini.LocationService.dto.MicroserviceResponse;
 import com.capgemini.LocationService.exceptions.CityAlreadyExistException;
 import com.capgemini.LocationService.exceptions.CityNotFoundException;
+import com.capgemini.LocationService.exceptions.MicroserviceException;
 import com.capgemini.LocationService.exceptions.OperationFailedException;
 import com.capgemini.LocationService.entities.City;
 
@@ -139,6 +141,5 @@ public class LocationServiceImpl implements LocationService {
             throw new NullPointerException("Null value supplied in payload");
         });
     }
-
 
 }

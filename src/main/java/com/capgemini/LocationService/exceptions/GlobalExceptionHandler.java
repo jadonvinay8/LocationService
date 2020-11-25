@@ -55,6 +55,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.ok(response);
     }
 
+    @ExceptionHandler(MicroserviceException.class)
+    public ResponseEntity<MicroserviceResponse> serviceCallException(MicroserviceException e) {
+        MicroserviceResponse response = ResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), null, e.getErrorResponse());
+        return ResponseEntity.ok(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<MicroserviceResponse> anyUnhandledException(Exception e) {
         ErrorResponse errorResponse = new ErrorResponse("Some unknown error occurred", e.getMessage(), "500");
