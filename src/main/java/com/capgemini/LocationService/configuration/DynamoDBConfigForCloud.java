@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 
-@Configuration
-@EnableDynamoDBRepositories(basePackages = "com.capgemini.LocationService")
+//@Configuration
+//@EnableDynamoDBRepositories(basePackages = "com.capgemini.LocationService")
 public class DynamoDBConfigForCloud {
 
     @Bean

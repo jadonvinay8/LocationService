@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
-//@Configuration
-//@EnableDynamoDBRepositories(basePackages = "com.capgemini.LocationService")
+@Configuration
+@EnableDynamoDBRepositories(basePackages = "com.capgemini.LocationService")
 public class DynamoDBConfig {
 
     @Value("${amazon.dynamodb.endpoint}")
@@ -33,7 +33,7 @@ public class DynamoDBConfig {
         return amazonDynamoDB;
     }
 
-//    @Bean
+    @Bean
     public AWSCredentials amazonAWSCredentials() {
         return new BasicAWSCredentials(amazonAWSAccessKey, amazonAWSSecretKey);
     }

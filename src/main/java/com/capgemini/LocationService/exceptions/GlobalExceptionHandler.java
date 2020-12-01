@@ -3,12 +3,15 @@ package com.capgemini.LocationService.exceptions;
 import com.capgemini.LocationService.dto.ErrorResponse;
 import com.capgemini.LocationService.dto.MicroserviceResponse;
 import com.capgemini.LocationService.utilities.ResponseBuilder;
+import org.apache.http.conn.HttpHostConnectException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,6 +48,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MicroserviceResponse> cityAlreadyExists(HttpMessageNotReadableException e) {
         ErrorResponse errorResponse = new ErrorResponse("Invalid request body supplied", e.getMessage(), "400");
         MicroserviceResponse response = ResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), null, errorResponse);
+        return ResponseEntity.ok(response);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<MicroserviceResponse> restException4xx(HttpClientErrorException e) {
+        ErrorResponse errorResponse = new ErrorResponse("Something went wrong in other API", e.getMessage(), "500");
+        MicroserviceResponse response = ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, errorResponse);
+        return ResponseEntity.ok(response);
+    }
+
+    @ExceptionHandler(HttpServerErrorException.class)
+    public ResponseEntity<MicroserviceResponse> restException5xx(HttpServerErrorException e) {
+        ErrorResponse errorResponse = new ErrorResponse("Something went wrong in other API", e.getMessage(), "500");
+        MicroserviceResponse response = ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, errorResponse);
         return ResponseEntity.ok(response);
     }
 

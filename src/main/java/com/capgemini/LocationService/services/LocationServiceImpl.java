@@ -1,18 +1,11 @@
 package com.capgemini.LocationService.services;
 
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import com.capgemini.LocationService.dao.LocationDAO;
-import com.capgemini.LocationService.dto.MicroserviceResponse;
+import com.capgemini.LocationService.entities.City;
 import com.capgemini.LocationService.exceptions.CityAlreadyExistException;
 import com.capgemini.LocationService.exceptions.CityNotFoundException;
-import com.capgemini.LocationService.exceptions.MicroserviceException;
 import com.capgemini.LocationService.exceptions.OperationFailedException;
-import com.capgemini.LocationService.entities.City;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,11 +14,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 /**
  * Service class to perform CRUD operations related to Location functionality
  *
  * @author Vinay Pratap Singh
- *
  */
 @Service
 @Transactional
@@ -93,16 +89,9 @@ public class LocationServiceImpl implements LocationService {
 
     public void deleteCity(String id) {
         City city = findById(id);
-		var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
-
-		try {
-			restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
-			locationDAO.delete(city);
-		} catch (HttpClientErrorException e) {
-			throw new OperationFailedException("Could not delete the underlying theaters, hence terminating the operation");
-		} catch (HttpServerErrorException e) {
-			throw new OperationFailedException("Something went wrong in other API");
-		}
+        var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
+        restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
+        locationDAO.delete(city);
     }
 
     public void addMultipleCities(List<String> cities) {
