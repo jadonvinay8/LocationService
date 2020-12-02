@@ -5,13 +5,10 @@ import com.capgemini.LocationService.dao.LocationDAO;
 import com.capgemini.LocationService.entities.City;
 import com.capgemini.LocationService.exceptions.CityAlreadyExistException;
 import com.capgemini.LocationService.exceptions.CityNotFoundException;
-import com.capgemini.LocationService.exceptions.OperationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -79,7 +76,7 @@ public class LocationServiceImpl implements LocationService {
         return locationDAO.findById(id).orElseThrow(CityNotFoundException::new);
     }
 
-    public City updateCity(String id, City city) {
+    public City updateCity(String id, City city) throws CityAlreadyExistException, CityNotFoundException {
         findById(id); // if this city didn't exist previously, an exception will be thrown
         city.setId(id);
 
@@ -87,14 +84,14 @@ public class LocationServiceImpl implements LocationService {
         return locationDAO.save(city);
     }
 
-    public void deleteCity(String id) {
+    public void deleteCity(String id) throws CityNotFoundException{
         City city = findById(id);
         var requestUrl = theaterRemovalUrl.replaceAll("cityId", id);
         restTemplate.delete(requestUrl); // delete theaters in this city by calling theater API
         locationDAO.delete(city);
     }
 
-    public void addMultipleCities(List<String> cities) {
+    public void addMultipleCities(List<String> cities) throws CityAlreadyExistException, NullPointerException {
         List<String> invalidCities = validateUniqueConstraint(cities);
         if (!invalidCities.isEmpty()) {
             throw new CityAlreadyExistException("These cities already exist: " + invalidCities);
@@ -110,7 +107,7 @@ public class LocationServiceImpl implements LocationService {
         locationDAO.saveAll(filteredCities);
     }
 
-    public Map<String, String> validateBatchExistence(List<String> cityIds) {
+    public Map<String, String> validateBatchExistence(List<String> cityIds) throws NullPointerException {
         Map<String, String> cityMap = new HashMap<>();
         List<String> invalidIds = new ArrayList<>();
 

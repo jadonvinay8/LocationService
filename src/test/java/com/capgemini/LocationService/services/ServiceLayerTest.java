@@ -150,12 +150,37 @@ public class ServiceLayerTest {
         assertEquals(6, cityMap.size());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testAddMultipleCitiesThrowsNullPointerException() {
+        List<City> cities = new ArrayList<>();
+        cityMap.forEach((key, value) -> cities.add(value));
+        when(locationDAO.findAll()).thenReturn(cities);
+        List<City> citiesToBeAdded = List.of(new City("Gurgaon"), new City("Delhi"));
+        List<City> addedCities = List.of(new City("10", "Gurgaon"), new City("11", "Delhi"));
+        List<String> namesToBeAdded = null;
+        when(locationDAO.saveAll(citiesToBeAdded)).thenReturn(addedCities);
+        service.addMultipleCities(namesToBeAdded);
+        assertEquals(6, cityMap.size());
+    }
+
     @Test
     public void testDeleteCity() {
         String id = "2";
         doNothing().when(restTemplate).delete(anyString());
         doNothing().when(locationDAO).delete(new City("2", "Delhi"));
         when(locationDAO.findById(id)).thenReturn(Optional.of(cityMap.get(id)));
+        ReflectionTestUtils.setField(service, "theaterRemovalUrl", id);
+        service.deleteCity(id);
+        cityMap.remove(id);
+        assertEquals(5, cityMap.size());
+    }
+
+    @Test(expected = CityNotFoundException.class)
+    public void testDeleteCityThrowsCityNotFoundException() {
+        String id = "7";
+        doNothing().when(restTemplate).delete(anyString());
+        doNothing().when(locationDAO).delete(new City("7", "Delhi"));
+        when(locationDAO.findById(id)).thenReturn(Optional.ofNullable(cityMap.get(id)));
         ReflectionTestUtils.setField(service, "theaterRemovalUrl", id);
         service.deleteCity(id);
         cityMap.remove(id);

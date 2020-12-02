@@ -3,7 +3,6 @@ package com.capgemini.LocationService.exceptions;
 import com.capgemini.LocationService.dto.ErrorResponse;
 import com.capgemini.LocationService.dto.MicroserviceResponse;
 import com.capgemini.LocationService.utilities.ResponseBuilder;
-import org.apache.http.conn.HttpHostConnectException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
